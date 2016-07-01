@@ -1,3 +1,5 @@
+require 'byebug'
+
 require_relative 'db_connection'
 require 'active_support/inflector'
 # NB: the attr_accessor we wrote in phase 0 is NOT used in the rest
@@ -5,18 +7,24 @@ require 'active_support/inflector'
 
 class SQLObject
   def self.columns
-    # ...
+    return @columns if @columns
+    @columns = []
+    columns = DBConnection.execute2("SELECT * from #{table_name}").first
+    columns.each { |column| @columns << column.to_sym }
+
+    @columns
   end
 
   def self.finalize!
   end
 
   def self.table_name=(table_name)
-    # ...
+    @table_name = table_name
   end
 
   def self.table_name
-    # ...
+    # debugger
+    @table_name ||= "#{self}".tableize
   end
 
   def self.all
