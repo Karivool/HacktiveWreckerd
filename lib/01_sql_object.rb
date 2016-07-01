@@ -9,14 +9,25 @@ class SQLObject
   def self.columns
     return @columns if @columns
     @columns = []
-    columns = DBConnection.execute2("SELECT * from #{table_name}").first
+    columns = DBConnection.execute2("SELECT * FROM #{table_name}").first
     columns.each { |column| @columns << column.to_sym }
 
     @columns
   end
 
   def self.finalize!
-    
+    columns.each do |column|
+
+      define_method(column) do
+        attributes[column]
+      end
+
+      define_method("#{column}=") do |value|
+        attributes[column] = value
+      end
+
+    end
+    @attributes
   end
 
   def self.table_name=(table_name)
@@ -24,16 +35,22 @@ class SQLObject
   end
 
   def self.table_name
-    # debugger
     @table_name ||= "#{self}".tableize
   end
 
   def self.all
-    # ...
+    @all = DBConnection.execute("SELECT #{table_name}.* FROM #{table_name}")
   end
 
   def self.parse_all(results)
-    # ...
+    if results = [{ name: 'cat1', owner_id: 1 }, { name: 'cat2', owner_id: 2 }]
+      debugger
+    end
+    results.each do |params|
+      # params.each do |key, value|
+      #   self.new(params)
+      # end
+    end
   end
 
   def self.find(id)
@@ -41,7 +58,15 @@ class SQLObject
   end
 
   def initialize(params = {})
-    # ...
+    columns = self.class.columns
+
+    params.each do |key, value|
+      unless columns.include?(key.to_sym)
+        raise "unknown attribute '#{key}'"
+      else
+        self.send("#{key.to_sym}=", value)
+      end
+    end
   end
 
   def attributes
@@ -49,7 +74,7 @@ class SQLObject
   end
 
   def attribute_values
-    # ...
+    @attributes.values
   end
 
   def insert
