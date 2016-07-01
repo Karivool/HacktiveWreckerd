@@ -16,6 +16,7 @@ class SQLObject
   end
 
   def self.finalize!
+    
   end
 
   def self.table_name=(table_name)
@@ -44,7 +45,7 @@ class SQLObject
   end
 
   def attributes
-    # ...
+    @attributes = @attributes.nil? ? {} : @attributes
   end
 
   def attribute_values
