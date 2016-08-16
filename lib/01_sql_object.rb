@@ -93,10 +93,26 @@ class SQLObject
   end
 
   def update
-    # ...
+    user_id = self.attributes[:id]
+    this = self.class
+    columns = this.columns.drop(1)
+
+    column_changes = columns.map do |attribute|
+      "#{attribute} = ?"
+    end.join(", ")
+
+    DBConnection.execute(<<-SQL, attribute_values.drop(1))
+      UPDATE #{this.table_name}
+      SET #{column_changes}
+      WHERE id = #{user_id}
+    SQL
   end
 
   def save
-    # ...
+    if self.id == nil || self.class.find(self.id) == nil
+      self.insert
+    else
+      self.update
+    end
   end
 end
