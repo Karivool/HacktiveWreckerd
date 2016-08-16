@@ -40,17 +40,17 @@ class SQLObject
 
   def self.all
     @all = DBConnection.execute("SELECT #{table_name}.* FROM #{table_name}")
+    parse_all(@all)
   end
 
   def self.parse_all(results)
-    if results = [{ name: 'cat1', owner_id: 1 }, { name: 'cat2', owner_id: 2 }]
-      debugger
+    parsed_results = []
+
+    results.each_with_index do |params|
+      parsed_results.push(self.new(params))
     end
-    results.each do |params|
-      # params.each do |key, value|
-      #   self.new(params)
-      # end
-    end
+
+    parsed_results
   end
 
   def self.find(id)
