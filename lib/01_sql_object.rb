@@ -54,7 +54,8 @@ class SQLObject
   end
 
   def self.find(id)
-    # ...
+    found_query = DBConnection.execute("SELECT #{table_name}.* FROM #{table_name} WHERE id = #{id}")
+    result = found_query.length >= 1 ? parse_all(found_query).first : nil
   end
 
   def initialize(params = {})
@@ -78,7 +79,17 @@ class SQLObject
   end
 
   def insert
-    # ...
+    this = self.class
+    columns = this.columns.drop(1)
+    column_names = columns.join(", ")
+    question_marks = (["?"] * columns.length).join(", ")
+
+    DBConnection.execute(<<-SQL, attribute_values)
+      INSERT INTO #{this.table_name} (#{column_names})
+      VALUES (#{question_marks})
+    SQL
+
+    self.id = DBConnection.last_insert_row_id
   end
 
   def update
