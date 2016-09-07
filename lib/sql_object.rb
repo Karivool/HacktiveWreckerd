@@ -1,9 +1,10 @@
-require 'byebug'
-
 require_relative 'db_connection'
 require 'active_support/inflector'
 
 class SQLObject
+  extend Searchable
+  extend Associatable
+
   def self.columns
     return @columns if @columns
     @columns = []
