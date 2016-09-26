@@ -67,7 +67,7 @@ class Eater < SQLObject
 end
 
 class Diner < SQLObject
- has_one_through: :diner, :eater
+  has_one_through: :diner, :eater
  
 end
 
