@@ -19,7 +19,7 @@ HacktiveWreckerd is a custom ORM, used to convert data between incompatiable typ
 ---
 Clone or download this repo. Replace `lib/db_connection.rb` with different fields as necessary (in this case, anything related to pizza/PIZZA).
 
-After, make your own model and require `sql_object` and `assoc_options`:
+Afterwards, make your own Rails model and require `sql_object` and `assoc_options` within:
 
 ```ruby
 #model.rb
@@ -32,4 +32,43 @@ class Pizza > SQLObject
 end
 ```
 
-Afterwards, go into irb/pry, and load the file to use HacktiveWreckerd's methods.
+Then, go into irb/pry, and load the file to try out HacktiveWreckerd's methods, or use them wherever you included them in your Rails project.
+
+```ruby
+#pizza.rb (Assumes model name is Pizza)
+
+Pizza.all
+# Returns all results for the db linked to the pizza model
+
+Pizza.find(1)
+# Finds the pizza model in question with the ID of 1
+
+Pizza.save # "pizza_name" => "Peppertony", "eater_id" => 3
+# Performs either .insert or .update, based on whether or not an id exists for the given SQL object.
+# .insert will create a new row in your db, while .update makes changes to an existing one
+
+Pizza.where(eater_id: 3)
+# This will find all associated db objects that have the eater_id of 3. 
+# This would return the pizza with the name, 'Peppertony'
+
+```
+
+You can also use methods to create associations between different models.
+
+```ruby
+class Pizza < SQLObject
+  belongs_to: eater
+
+end
+
+class Eater < SQLObject
+  has_many: pizzas
+
+end
+
+class Diner < SQLObject
+ has_one_through: :diner, :eater
+ 
+end
+
+```
